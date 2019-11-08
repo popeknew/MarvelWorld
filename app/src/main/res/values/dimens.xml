@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    //Basic dimens
+    <dimen name="zero_dp">0dp</dimen>
+    <dimen name="standard_margin">16dp</dimen>
+
+    //Login Activity
+    <dimen name="login_input_edit_text_left_margin">20dp</dimen>
+    <dimen name="login_input_edit_text_right_margin">20dp</dimen>
+    <dimen name="login_input_edit_text_height">60dp</dimen>
+    <dimen name="login_log_in_button_left_margin">20dp</dimen>
+    <dimen name="login_log_in_button_right_margin">20dp</dimen>
+
+</resources>

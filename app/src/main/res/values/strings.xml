@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">MarvelWorld</string>
+
+    //Login Activity
+    <string name="login_login_hint">Username</string>
+    <string name="login_password_hint">Password</string>
+    <string name="login_log_in_button_log_in">Log in</string>
+    <string name="login_empty_field_error">Password can not be empty!</string>
+    <string name="login_email_error">Email is not valid!</string>
+</resources>
