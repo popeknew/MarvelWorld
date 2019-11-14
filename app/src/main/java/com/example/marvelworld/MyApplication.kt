@@ -8,6 +8,7 @@ import com.example.marvelworld.utility.VerificationUtils
 import com.example.marvelworld.vm.LoginViewModel
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.android.viewmodel.dsl.viewModel
@@ -16,7 +17,7 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-private const val BASE_URL = "http://gateway.marvel.com/"
+private const val BASE_URL = "https://gateway.marvel.com/"
 
 class MyApplication: Application() {
 
@@ -25,7 +26,7 @@ class MyApplication: Application() {
     }
 
     private val netModule = module {
-        factory { AuthInterceptor() }
+       factory { AuthInterceptor() }
         single { provideOkHttpClient(get()) }
         single { provideRetrofit(get()) }
         single { provideRestApi(get()) }
@@ -33,7 +34,8 @@ class MyApplication: Application() {
     }
 
     private fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
-        return OkHttpClient().newBuilder().addInterceptor(authInterceptor).build()
+        val logging = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
+        return OkHttpClient().newBuilder().addInterceptor(authInterceptor).addInterceptor(logging).build()
     }
 
     private fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {

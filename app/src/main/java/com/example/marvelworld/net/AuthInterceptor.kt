@@ -13,7 +13,7 @@ class AuthInterceptor : Interceptor {
     private val authHashGenerator = AuthHashGenerator()
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val timestamp = System.currentTimeMillis().toString()
+        val timestamp = System.currentTimeMillis()
         var hash = ""
         try {
             hash = authHashGenerator.generateHash(timestamp, myPublicKey, myPrivateKey)
@@ -23,7 +23,7 @@ class AuthInterceptor : Interceptor {
         var request = chain.request()
         val url = request.url()
             .newBuilder()
-            .addQueryParameter(TIMESTAMP_KEY, timestamp)
+            .addQueryParameter(TIMESTAMP_KEY, timestamp.toString())
             .addQueryParameter(APIKEY_KEY, myPublicKey)
             .addQueryParameter(HASH_KEY, hash)
             .build()
