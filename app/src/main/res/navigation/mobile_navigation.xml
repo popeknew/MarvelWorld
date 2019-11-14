@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.example.marvelworld.fragment.HomeFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/nav_characters"
+        android:name="com.example.marvelworld.fragment.CharactersFragment"
+        android:label="@string/menu_characters"
+        tools:layout="@layout/fragment_characters" />
+
+    <fragment
+        android:id="@+id/nav_comics"
+        android:name="com.example.marvelworld.fragment.ComicsFragment"
+        android:label="@string/menu_comics"
+        tools:layout="@layout/fragment_comics" />
+
+    <fragment
+        android:id="@+id/nav_creators"
+        android:name="com.example.marvelworld.activity.ui.tools.CreatorsFragment"
+        android:label="@string/menu_creators"
+        tools:layout="@layout/fragment_creators" />
+
+    <fragment
+        android:id="@+id/nav_events"
+        android:name="com.example.marvelworld.fragment.EventsFragment"
+        android:label="@string/menu_events"
+        tools:layout="@layout/fragment_events" />
+
+    <fragment
+        android:id="@+id/nav_series"
+        android:name="com.example.marvelworld.fragment.SeriesFragment"
+        android:label="@string/menu_series"
+        tools:layout="@layout/fragment_series" />
+
+    <fragment
+        android:id="@+id/nav_stories"
+        android:name="com.example.marvelworld.fragment.StoriesFragment"
+        android:label="@string/menu_stories"
+        tools:layout="@layout/fragment_series" />
+</navigation>

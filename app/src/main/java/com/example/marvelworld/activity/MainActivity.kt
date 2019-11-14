@@ -26,24 +26,5 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        var test = ""
-        var character = CharacterResponse(100, CharacterData(listOf(Character(1, "asd", CharacterImage("asd", "asd")))))
-
-        testButton.setOnClickListener {
-            GlobalScope.launch {
-                withContext(Dispatchers.Default) {
-                    test = repository.getAllCharacters().data.results[0].thumbnail.path
-                    character = repository.getCharacter(1011334)
-                }
-            }
-        }
-
-        drugiTestButton.setOnClickListener {
-            Glide.with(imageTest)
-                .load(createPictureUrl(character.data.results[0], PictureSize.PORTRAIT_FANTASTIC))
-                .into(imageTest)
-        }
-
     }
 }
