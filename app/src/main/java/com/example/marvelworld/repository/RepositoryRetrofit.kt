@@ -9,4 +9,6 @@ class RepositoryRetrofit(private val api: RestApi) {
     suspend fun getTest() : Character = api.getTest().await()
 
     suspend fun getAllCharacters(): CharacterResponse = api.getAllCharacters().await()
+
+    suspend fun getCharacter(characterId: Int): CharacterResponse = api.getCharacter(characterId).await()
 }

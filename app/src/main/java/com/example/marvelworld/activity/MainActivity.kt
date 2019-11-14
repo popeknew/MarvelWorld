@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.marvelworld.R
 import com.example.marvelworld.ext.changeToSecureUrl
+import com.example.marvelworld.ext.createPictureUrl
+import com.example.marvelworld.model.*
 import com.example.marvelworld.repository.RepositoryRetrofit
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
@@ -26,19 +28,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         var test = ""
+        var character = CharacterResponse(100, CharacterData(listOf(Character(1, "asd", CharacterImage("asd", "asd")))))
 
         testButton.setOnClickListener {
             GlobalScope.launch {
                 withContext(Dispatchers.Default) {
                     test = repository.getAllCharacters().data.results[0].thumbnail.path
+                    character = repository.getCharacter(1011334)
                 }
             }
         }
 
         drugiTestButton.setOnClickListener {
-            println("${test.changeToSecureUrl()} -----------------------------------------------------------")
             Glide.with(imageTest)
-                .load(test.changeToSecureUrl())
+                .load(createPictureUrl(character.data.results[0], PictureSize.PORTRAIT_FANTASTIC))
                 .into(imageTest)
         }
 

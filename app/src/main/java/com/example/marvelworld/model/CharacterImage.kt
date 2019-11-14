@@ -4,5 +4,6 @@ import com.google.gson.annotations.SerializedName
 
 data class CharacterImage(
     @SerializedName("path")
-    val path: String
+    val path: String,
+    val extension: String
 )

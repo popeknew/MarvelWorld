@@ -15,5 +15,5 @@ interface RestApi {
     fun getAllCharacters(): Deferred<CharacterResponse>
 
     @GET("/v1/public/characters/{characterId}")
-    fun getCharacter(@Path("characterId") characterId: String): Deferred<Character>
+    fun getCharacter(@Path("characterId") characterId: Int): Deferred<CharacterResponse>
 }
