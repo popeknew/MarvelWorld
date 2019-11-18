@@ -1,4 +1,4 @@
-package com.example.marvelworld.activity.ui.tools
+package com.example.marvelworld.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.marvelworld.R
+import com.example.marvelworld.vm.CreatorsViewModel
 
 class CreatorsFragment : Fragment() {
 

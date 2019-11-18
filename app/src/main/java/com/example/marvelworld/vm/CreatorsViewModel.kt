@@ -1,4 +1,4 @@
-package com.example.marvelworld.activity.ui.tools
+package com.example.marvelworld.vm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="character"
+            type="com.example.marvelworld.model.Character" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:background="@color/colorAccent"
+        android:layout_marginBottom="7dp">
+
+        <ImageView
+            android:id="@+id/avatar"
+            android:layout_width="168dp"
+            setAvatar="@{character}"
+            android:layout_height="225dp"
+            android:layout_margin="@dimen/image_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/name_title_margin"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:text="@{character.name}"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/name_title_text_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/avatar"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Superhero name"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

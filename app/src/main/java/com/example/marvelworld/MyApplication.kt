@@ -5,7 +5,7 @@ import com.example.marvelworld.net.AuthInterceptor
 import com.example.marvelworld.net.RestApi
 import com.example.marvelworld.repository.RepositoryRetrofit
 import com.example.marvelworld.utility.VerificationUtils
-import com.example.marvelworld.vm.LoginViewModel
+import com.example.marvelworld.vm.*
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -33,6 +33,16 @@ class MyApplication: Application() {
         single { RepositoryRetrofit(get()) }
     }
 
+    private val viewModelModule = module {
+        viewModel { LoginViewModel(get()) }
+        viewModel { CharactersViewModel() }
+        viewModel { ComicsViewModel() }
+        viewModel { EventsViewModel() }
+        viewModel { HomeViewModel() }
+        viewModel { SeriesViewModel() }
+        viewModel { StoriesViewModel() }
+    }
+
     private fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
         val logging = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
         return OkHttpClient().newBuilder().addInterceptor(authInterceptor).addInterceptor(logging).build()
@@ -48,10 +58,6 @@ class MyApplication: Application() {
     }
 
     private fun provideRestApi(retrofit: Retrofit): RestApi = retrofit.create(RestApi::class.java)
-
-    private val viewModelModule = module {
-        viewModel { LoginViewModel(get()) }
-    }
 
     override fun onCreate() {
         super.onCreate()
