@@ -3,6 +3,7 @@
     <!-- Basic dimens -->
     <dimen name="zero_dp">0dp</dimen>
     <dimen name="standard_margin">16dp</dimen>
+    <dimen name="half_standard_margin">8dp</dimen>
 
     <!-- Login Activity -->
     <dimen name="login_input_edit_text_left_margin">20dp</dimen>
@@ -22,5 +23,9 @@
     <dimen name="image_margin">10dp</dimen>
     <dimen name="name_title_margin">20dp</dimen>
     <dimen name="name_title_text_size">20sp</dimen>
+    <dimen name="card_elevation">5dp</dimen>
+    <dimen name="card_height">250dp</dimen>
+    <dimen name="card_image_width">168dp</dimen>
+    <dimen name="card_image_height">225dp</dimen>
 
 </resources>
