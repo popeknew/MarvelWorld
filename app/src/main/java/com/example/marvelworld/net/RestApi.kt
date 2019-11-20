@@ -5,6 +5,7 @@ import com.example.marvelworld.model.CharacterResponse
 import kotlinx.coroutines.Deferred
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface RestApi {
 
@@ -12,7 +13,7 @@ interface RestApi {
     fun getTest() : Deferred<Character>
 
     @GET("/v1/public/characters")
-    fun getAllCharacters(): Deferred<CharacterResponse>
+    fun getAllCharacters(@Query("offset") offset: Int): Deferred<CharacterResponse>
 
     @GET("/v1/public/characters/{characterId}")
     fun getCharacter(@Path("characterId") characterId: Int): Deferred<CharacterResponse>

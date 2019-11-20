@@ -44,8 +44,8 @@ class MyApplication: Application() {
     }
 
     private fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
-        val logging = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
-        return OkHttpClient().newBuilder().addInterceptor(authInterceptor).addInterceptor(logging).build()
+     //   val logging = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
+        return OkHttpClient().newBuilder().addInterceptor(authInterceptor).build() //.addInterceptor(logging)
     }
 
     private fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {

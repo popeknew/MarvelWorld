@@ -10,4 +10,11 @@ class CharactersViewModel : ViewModel() {
         value = "This is gallery Fragment"
     }
     val text: LiveData<String> = _text
+
+    private val _isLoadingData = MutableLiveData<Boolean>(false)
+    val isLoadingData: LiveData<Boolean> = _isLoadingData
+
+    fun setLoadingState(isOrNot: Boolean) {
+        _isLoadingData.value = isOrNot
+    }
 }

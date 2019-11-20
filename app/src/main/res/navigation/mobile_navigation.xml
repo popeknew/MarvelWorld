@@ -15,7 +15,11 @@
         android:id="@+id/nav_characters"
         android:name="com.example.marvelworld.fragment.CharactersFragment"
         android:label="@string/menu_characters"
-        tools:layout="@layout/fragment_characters" />
+        tools:layout="@layout/fragment_characters" >
+        <action
+            android:id="@+id/action_nav_characters_to_characterDetailsFragment"
+            app:destination="@id/characterDetailsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_comics"
@@ -46,4 +50,13 @@
         android:name="com.example.marvelworld.fragment.StoriesFragment"
         android:label="@string/menu_stories"
         tools:layout="@layout/fragment_series" />
+    <fragment
+        android:id="@+id/characterDetailsFragment"
+        android:name="com.example.marvelworld.fragment.CharacterDetailsFragment"
+        android:label="fragment_character_details"
+        tools:layout="@layout/fragment_character_details" >
+        <argument
+            android:name="selectedCharacterId"
+            app:argType="integer" />
+    </fragment>
 </navigation>

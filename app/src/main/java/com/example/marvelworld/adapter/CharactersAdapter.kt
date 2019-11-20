@@ -8,6 +8,8 @@ import com.example.marvelworld.model.Character
 
 class CharactersAdapter : RecyclerView.Adapter<CharactersAdapter.CharactersViewHolder>() {
 
+    var onRowClicked: ((Int) -> Unit)? = null
+
     private val characterList = mutableListOf<Character>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CharactersViewHolder {
@@ -18,7 +20,12 @@ class CharactersAdapter : RecyclerView.Adapter<CharactersAdapter.CharactersViewH
 
     override fun getItemCount() = characterList.size
 
-    override fun onBindViewHolder(holder: CharactersViewHolder, position: Int) = holder.bind(characterList[position])
+    override fun onBindViewHolder(holder: CharactersViewHolder, position: Int) {
+        holder.bind(characterList[position])
+        holder.itemView.setOnClickListener {
+            onRowClicked?.invoke(characterList[position].id)
+        }
+    }
 
     inner class CharactersViewHolder(private val binding: RowCharacterBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(character: Character) {
@@ -27,8 +34,7 @@ class CharactersAdapter : RecyclerView.Adapter<CharactersAdapter.CharactersViewH
         }
     }
 
-    fun swapList(list: List<Character>) {
-        characterList.clear()
+    fun addToList(list: List<Character>) {
         characterList.addAll(list)
         notifyDataSetChanged()
     }
