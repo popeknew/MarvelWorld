@@ -8,11 +8,11 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.example.marvelworld.adapter.CharactersAdapter
 import com.example.marvelworld.databinding.FragmentCharactersBinding
 import com.example.marvelworld.model.Character
 import com.example.marvelworld.repository.RepositoryRetrofit
+import com.example.marvelworld.utility.EndlessRecyclerViewScrollListener
 import com.example.marvelworld.vm.CharactersViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -30,7 +30,7 @@ class CharactersFragment : Fragment() {
     private var pageOffset = 0
     private var pageLimit = 0
     private lateinit var layoutManager: LinearLayoutManager
-    private val minRowsOnPage = 2
+    private lateinit var endlessRecyclerViewScrollListener: EndlessRecyclerViewScrollListener
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,16 +47,17 @@ class CharactersFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        layoutManager = LinearLayoutManager(context)
+        initializeEndlessScrollerListener()
         setupRecyclerView()
         openCharacterDetails()
     }
 
     private fun setupRecyclerView() {
-        layoutManager = LinearLayoutManager(context)
         with(binding.recyclerView) {
             adapter = charactersAdapter
             layoutManager = this@CharactersFragment.layoutManager
-            addOnScrollListener(scrollListener)
+            addOnScrollListener(endlessRecyclerViewScrollListener)
         }
         getCharactersFromServer()
     }
@@ -80,25 +81,21 @@ class CharactersFragment : Fragment() {
         charactersAdapter.addToList(list)
     }
 
-    private val scrollListener = object : OnScrollListener() {
-
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            super.onScrolled(recyclerView, dx, dy)
-
-            val totalItems = layoutManager.itemCount // ile ogolnie
-            val scrollOutItems =
-                layoutManager.findFirstVisibleItemPosition() // ile poza zasiegiem
-
-            if (totalItems - scrollOutItems == minRowsOnPage) {
-                pageOffset += pageLimit
-                getCharactersFromServer()
+    private fun initializeEndlessScrollerListener() {
+        endlessRecyclerViewScrollListener =
+            object : EndlessRecyclerViewScrollListener(layoutManager) {
+                override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
+                    pageOffset += pageLimit
+                    getCharactersFromServer()
+                }
             }
-        }
     }
 
     private fun openCharacterDetails() {
         charactersAdapter.onRowClicked = { selectedCharacterId ->
-            val action = CharactersFragmentDirections.actionNavCharactersToCharacterDetailsFragment(selectedCharacterId)
+            val action = CharactersFragmentDirections.actionNavCharactersToCharacterDetailsFragment(
+                selectedCharacterId
+            )
             view?.findNavController()?.navigate(action)
         }
     }

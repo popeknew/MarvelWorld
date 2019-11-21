@@ -27,7 +27,8 @@ class CharactersAdapter : RecyclerView.Adapter<CharactersAdapter.CharactersViewH
         }
     }
 
-    inner class CharactersViewHolder(private val binding: RowCharacterBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class CharactersViewHolder(private val binding: RowCharacterBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(character: Character) {
             binding.character = character
             binding.executePendingBindings()
