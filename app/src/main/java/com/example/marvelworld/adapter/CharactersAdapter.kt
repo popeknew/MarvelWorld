@@ -39,4 +39,16 @@ class CharactersAdapter : RecyclerView.Adapter<CharactersAdapter.CharactersViewH
         characterList.addAll(list)
         notifyDataSetChanged()
     }
+
+    fun swapList(list: List<Character>) {
+        characterList.clear()
+        characterList.addAll(list)
+        notifyDataSetChanged()
+    }
+
+    fun clearList() {
+        characterList.clear()
+    }
+
+    fun getListSize(): Int = characterList.size
 }

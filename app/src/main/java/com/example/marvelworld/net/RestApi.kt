@@ -17,4 +17,7 @@ interface RestApi {
 
     @GET("/v1/public/characters/{characterId}")
     fun getCharacter(@Path("characterId") characterId: Int): Deferred<CharacterResponse>
+
+    @GET("/v1/public/characters")
+    fun getCharacterNameStartsWith(@Query("nameStartsWith") nameStartsWith: String) : Deferred<CharacterResponse>
 }

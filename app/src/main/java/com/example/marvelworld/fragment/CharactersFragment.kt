@@ -1,10 +1,13 @@
 package com.example.marvelworld.fragment
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -51,6 +54,29 @@ class CharactersFragment : Fragment() {
         initializeEndlessScrollerListener()
         setupRecyclerView()
         openCharacterDetails()
+
+        binding.mainSearchText.setRightDrawableOnTouchListener { text?.clear() }
+        viewModel.searchInput.observe(viewLifecycleOwner, Observer<String> { text ->
+            if (text.length > 3) {
+                //    charactersAdapter.swapList(getCharacterFromServerNameStartsWith(text))
+            }
+        })
+        binding.mainSearchText.addTextChangedListener(object : TextWatcher {
+
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (count >= 3) {
+                    binding.recyclerView.scheduleLayoutAnimation()
+                    getCharacterFromServerNameStartsWith(s.toString())
+                } else if (count <= 1) {
+                    charactersAdapter.clearList()
+                    getCharactersFromServer()
+                }
+            }
+        })
     }
 
     private fun setupRecyclerView() {
@@ -76,6 +102,18 @@ class CharactersFragment : Fragment() {
         }
     }
 
+    private fun getCharacterFromServerNameStartsWith(text: String) {
+        viewModel.setLoadingState(true)
+        GlobalScope.launch {
+            withContext(Dispatchers.Main) {
+                characterList.clear()
+                val response = repository.getCharacterNameStartsWith(text).data.results
+                swapCharacterList(response)
+                viewModel.setLoadingState(false)
+            }
+        }
+    }
+
     private fun sendCharacterListToRecycler(list: List<Character>) {
         binding.recyclerView.scheduleLayoutAnimation()
         charactersAdapter.addToList(list)
@@ -91,6 +129,11 @@ class CharactersFragment : Fragment() {
             }
     }
 
+    private fun swapCharacterList(list: List<Character>) {
+        binding.recyclerView.scheduleLayoutAnimation()
+        charactersAdapter.swapList(list)
+    }
+    
     private fun openCharacterDetails() {
         charactersAdapter.onRowClicked = { selectedCharacterId ->
             val action = CharactersFragmentDirections.actionNavCharactersToCharacterDetailsFragment(

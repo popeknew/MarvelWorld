@@ -14,11 +14,34 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/mainSearchText"
+            android:layout_width="@dimen/zero_dp"
+            android:layout_marginTop="@dimen/half_standard_margin"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:drawableStart="@drawable/search_black"
+            android:drawableEnd="@drawable/close_black"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:lines="1"
+            android:text="@{viewModel.searchInput}"
+            android:maxLines="1"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:layout_height="@dimen/characters_search_edit_text_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="@dimen/zero_dp"
+            android:layout_height="@dimen/zero_dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mainSearchText"
             tools:listitem="@layout/row_character" />
+        <!--    -->
 
         <ProgressBar
             android:id="@+id/progressBar"
