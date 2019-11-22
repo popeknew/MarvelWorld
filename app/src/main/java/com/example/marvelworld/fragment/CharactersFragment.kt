@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marvelworld.adapter.CharactersAdapter
 import com.example.marvelworld.databinding.FragmentCharactersBinding
+import com.example.marvelworld.ext.setRightDrawableOnTouchListener
 import com.example.marvelworld.model.Character
 import com.example.marvelworld.repository.RepositoryRetrofit
 import com.example.marvelworld.utility.EndlessRecyclerViewScrollListener
@@ -34,6 +35,7 @@ class CharactersFragment : Fragment() {
     private var pageLimit = 0
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var endlessRecyclerViewScrollListener: EndlessRecyclerViewScrollListener
+    private var isUsingGetCharacterWithName = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,7 +53,7 @@ class CharactersFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         layoutManager = LinearLayoutManager(context)
-        initializeEndlessScrollerListener()
+        initializeEndlessScrollListener()
         setupRecyclerView()
         openCharacterDetails()
 
@@ -68,13 +70,16 @@ class CharactersFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (count >= 3) {
-                    binding.recyclerView.scheduleLayoutAnimation()
-                    getCharacterFromServerNameStartsWith(s.toString())
-                } else if (count <= 1) {
-                    charactersAdapter.clearList()
-                    getCharactersFromServer()
-                }
+
+                    if (count >= 3 && !isUsingGetCharacterWithName) {
+                        binding.recyclerView.scheduleLayoutAnimation()
+                        getCharacterFromServerNameStartsWith(s.toString())
+                    } else if (count <= 1) {
+                        charactersAdapter.clearList()
+                        pageOffset = 0
+                        getCharactersFromServer()
+                    }
+
             }
         })
     }
@@ -89,6 +94,7 @@ class CharactersFragment : Fragment() {
     }
 
     private fun getCharactersFromServer() {
+        isUsingGetCharacterWithName = false
         viewModel.setLoadingState(true)
         GlobalScope.launch {
             withContext(Dispatchers.Main) {
@@ -103,6 +109,7 @@ class CharactersFragment : Fragment() {
     }
 
     private fun getCharacterFromServerNameStartsWith(text: String) {
+        isUsingGetCharacterWithName = true
         viewModel.setLoadingState(true)
         GlobalScope.launch {
             withContext(Dispatchers.Main) {
@@ -119,7 +126,7 @@ class CharactersFragment : Fragment() {
         charactersAdapter.addToList(list)
     }
 
-    private fun initializeEndlessScrollerListener() {
+    private fun initializeEndlessScrollListener() {
         endlessRecyclerViewScrollListener =
             object : EndlessRecyclerViewScrollListener(layoutManager) {
                 override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
@@ -133,8 +140,9 @@ class CharactersFragment : Fragment() {
         binding.recyclerView.scheduleLayoutAnimation()
         charactersAdapter.swapList(list)
     }
-    
+
     private fun openCharacterDetails() {
+        pageOffset = 0
         charactersAdapter.onRowClicked = { selectedCharacterId ->
             val action = CharactersFragmentDirections.actionNavCharactersToCharacterDetailsFragment(
                 selectedCharacterId
