@@ -17,6 +17,7 @@
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/mainSearchText"
             android:layout_width="@dimen/zero_dp"
+            android:visibility="gone"
             android:layout_marginTop="@dimen/half_standard_margin"
             android:layout_marginStart="@dimen/standard_margin"
             android:drawableStart="@drawable/search_black"
@@ -24,7 +25,6 @@
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:lines="1"
-            android:text="@{viewModel.searchInput}"
             android:maxLines="1"
             android:layout_marginEnd="@dimen/standard_margin"
             android:layout_height="@dimen/characters_search_edit_text_height"
@@ -32,16 +32,28 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <com.mancj.materialsearchbar.MaterialSearchBar
+            android:id="@+id/materialSearchBar"
+            android:layout_width="@dimen/zero_dp"
+            android:padding="@dimen/standard_margin"
+            android:layout_margin="@dimen/standard_margin"
+            android:layout_height="wrap_content"
+            app:mt_speechMode="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mainSearchText" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="@dimen/zero_dp"
             android:layout_height="@dimen/zero_dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/mainSearchText"
+            app:layout_constraintTop_toBottomOf="@+id/materialSearchBar"
+            app:layout_constraintVertical_bias="0.0"
             tools:listitem="@layout/row_character" />
-        <!--    -->
 
         <ProgressBar
             android:id="@+id/progressBar"

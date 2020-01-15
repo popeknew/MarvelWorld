@@ -13,13 +13,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marvelworld.adapter.CharactersAdapter
 import com.example.marvelworld.databinding.FragmentCharactersBinding
+import com.example.marvelworld.ext.empty
 import com.example.marvelworld.ext.setRightDrawableOnTouchListener
 import com.example.marvelworld.model.Character
 import com.example.marvelworld.repository.RepositoryRetrofit
 import com.example.marvelworld.utility.EndlessRecyclerViewScrollListener
 import com.example.marvelworld.vm.CharactersViewModel
+import com.mancj.materialsearchbar.MaterialSearchBar
+import kotlinx.android.synthetic.main.fragment_characters.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
@@ -36,6 +42,7 @@ class CharactersFragment : Fragment() {
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var endlessRecyclerViewScrollListener: EndlessRecyclerViewScrollListener
     private var isUsingGetCharacterWithName = false
+    private val lastSuggestionsList = mutableListOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,33 +64,79 @@ class CharactersFragment : Fragment() {
         setupRecyclerView()
         openCharacterDetails()
 
-        binding.mainSearchText.setRightDrawableOnTouchListener { text?.clear() }
-        viewModel.searchInput.observe(viewLifecycleOwner, Observer<String> { text ->
-            if (text.length > 3) {
-                //    charactersAdapter.swapList(getCharacterFromServerNameStartsWith(text))
+        with(binding.mainSearchText) {
+            setRightDrawableOnTouchListener {
+                text?.clear()
+                charactersAdapter.clearList()
+                pageOffset = 0
+                getCharactersFromServer()
             }
-        })
-        binding.mainSearchText.addTextChangedListener(object : TextWatcher {
+            addTextChangedListener(searchTextChangeListener)
+        }
 
-            override fun afterTextChanged(s: Editable?) {}
+        with(binding.materialSearchBar) {
+            setHint("Tap character")
+            setCardViewElevation(10)
+            addTextChangeListener(object : TextWatcher {
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-                    if (count >= 3 && !isUsingGetCharacterWithName) {
-                        binding.recyclerView.scheduleLayoutAnimation()
-                        getCharacterFromServerNameStartsWith(s.toString())
-                    } else if (count <= 1) {
-                        charactersAdapter.clearList()
-                        pageOffset = 0
-                        getCharactersFromServer()
+                override fun afterTextChanged(s: Editable?) {
+                    if (s.isNullOrEmpty().not()) {
+                        isUsingGetCharacterWithName = true
+                        viewModel.setLoadingState(true)
+                        GlobalScope.launch {
+                            withContext(Dispatchers.Main) {
+                                startSearch(s.toString()).collect { value ->
+                                    characterList.clear()
+                                    swapCharacterList(value)
+                                    viewModel.setLoadingState(false)
+                                }
+                            }
+                        }
                     }
+                }
 
-            }
-        })
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {}
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    val suggest = ArrayList<String>()
+                    for (search in lastSuggestionsList) {
+                        if (search.toLowerCase().contains(materialSearchBar.text.toLowerCase())) {
+                            suggest.add(search)
+                            materialSearchBar.lastSuggestions = suggest
+                        }
+                    }
+                }
+            })
+//            setOnSearchActionListener(object : MaterialSearchBar.OnSearchActionListener {
+//                override fun onButtonClicked(buttonCode: Int) {
+//                    if (buttonCode == 0) {
+//                        println("$text -----------------------------------------------------------")
+//                    }
+//                }
+//
+//                override fun onSearchStateChanged(enabled: Boolean) {
+//                    if (!enabled) {
+//                        binding.recyclerView.adapter = charactersAdapter
+//                    }
+//                }
+//
+//                override fun onSearchConfirmed(text: CharSequence?) {
+//                    //after ok click
+//                }
+//            })
+        }
     }
 
+    fun startSearch(text: String) = flow {
+        val characterList = repository.getCharacterNameStartsWith(text).data.results
+        emit(characterList)
+    }
+    
     private fun setupRecyclerView() {
         with(binding.recyclerView) {
             adapter = charactersAdapter
@@ -130,9 +183,18 @@ class CharactersFragment : Fragment() {
         endlessRecyclerViewScrollListener =
             object : EndlessRecyclerViewScrollListener(layoutManager) {
                 override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
-                    pageOffset += pageLimit
-                    getCharactersFromServer()
+                    if (!isUsingGetCharacterWithName) {
+                        pageOffset += pageLimit
+                        getCharactersFromServer()
+                    }
                 }
+            }
+    }
+
+    private fun turnOffEndlessScrollListener() {
+        endlessRecyclerViewScrollListener =
+            object : EndlessRecyclerViewScrollListener(layoutManager) {
+                override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {}
             }
     }
 
@@ -148,6 +210,24 @@ class CharactersFragment : Fragment() {
                 selectedCharacterId
             )
             view?.findNavController()?.navigate(action)
+        }
+    }
+
+    private val searchTextChangeListener = object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {}
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            if (count >= 3 && !isUsingGetCharacterWithName) {
+                turnOffEndlessScrollListener()
+                binding.recyclerView.scheduleLayoutAnimation()
+                getCharacterFromServerNameStartsWith(s.toString())
+            } else if (count <= 1) {
+                initializeEndlessScrollListener()
+                charactersAdapter.clearList()
+                pageOffset = 0
+                getCharactersFromServer()
+            }
         }
     }
 }

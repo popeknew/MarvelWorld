@@ -15,9 +15,6 @@ class CharactersViewModel : ViewModel() {
     private val _isLoadingData = MutableLiveData<Boolean>(false)
     val isLoadingData: LiveData<Boolean> = _isLoadingData
 
-    private val _searchInput = MutableLiveData<String>(String.empty)
-    val searchInput: LiveData<String> = _searchInput
-
     fun setLoadingState(isOrNot: Boolean) {
         _isLoadingData.value = isOrNot
     }
