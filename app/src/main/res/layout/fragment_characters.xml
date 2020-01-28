@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="android.view.View"/>
+
+        <import type="android.view.View" />
+
         <variable
             name="viewModel"
             type="com.example.marvelworld.vm.CharactersViewModel" />
@@ -17,31 +19,21 @@
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/mainSearchText"
             android:layout_width="@dimen/zero_dp"
-            android:visibility="gone"
-            android:layout_marginTop="@dimen/half_standard_margin"
+            android:layout_height="@dimen/characters_search_edit_text_height"
             android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginTop="@dimen/half_standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
             android:drawableStart="@drawable/search_black"
             android:drawableEnd="@drawable/close_black"
             android:imeOptions="actionSearch"
             android:inputType="text"
+            android:cursorVisible="@{viewModel.searchBarVisibility}"
             android:lines="1"
             android:maxLines="1"
-            android:layout_marginEnd="@dimen/standard_margin"
-            android:layout_height="@dimen/characters_search_edit_text_height"
+            android:visibility="@{viewModel.searchBarVisibility ? View.VISIBLE : View.GONE }"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <com.mancj.materialsearchbar.MaterialSearchBar
-            android:id="@+id/materialSearchBar"
-            android:layout_width="@dimen/zero_dp"
-            android:padding="@dimen/standard_margin"
-            android:layout_margin="@dimen/standard_margin"
-            android:layout_height="wrap_content"
-            app:mt_speechMode="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mainSearchText" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
@@ -51,7 +43,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/materialSearchBar"
+            app:layout_constraintTop_toBottomOf="@+id/mainSearchText"
             app:layout_constraintVertical_bias="0.0"
             tools:listitem="@layout/row_character" />
 
@@ -59,8 +51,8 @@
             android:id="@+id/progressBar"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:visibility="@{viewModel.isLoadingData ? View.VISIBLE : View.GONE }"
             android:indeterminateTint="@android:color/black"
+            android:visibility="@{viewModel.isLoadingData ? View.VISIBLE : View.GONE }"
             app:layout_constraintBottom_toBottomOf="@+id/recycler_view"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

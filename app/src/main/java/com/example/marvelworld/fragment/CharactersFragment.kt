@@ -3,27 +3,31 @@ package com.example.marvelworld.fragment
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.marvelworld.R
 import com.example.marvelworld.adapter.CharactersAdapter
 import com.example.marvelworld.databinding.FragmentCharactersBinding
-import com.example.marvelworld.ext.empty
+import com.example.marvelworld.ext.hideKeyboard
 import com.example.marvelworld.ext.setRightDrawableOnTouchListener
 import com.example.marvelworld.model.Character
 import com.example.marvelworld.repository.RepositoryRetrofit
 import com.example.marvelworld.utility.EndlessRecyclerViewScrollListener
 import com.example.marvelworld.vm.CharactersViewModel
-import com.mancj.materialsearchbar.MaterialSearchBar
-import kotlinx.android.synthetic.main.fragment_characters.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -42,7 +46,6 @@ class CharactersFragment : Fragment() {
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var endlessRecyclerViewScrollListener: EndlessRecyclerViewScrollListener
     private var isUsingGetCharacterWithName = false
-    private val lastSuggestionsList = mutableListOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,6 +56,7 @@ class CharactersFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
             viewModel = this@CharactersFragment.viewModel
         }
+        setHasOptionsMenu(true)
         return binding.root
     }
 
@@ -67,76 +71,29 @@ class CharactersFragment : Fragment() {
         with(binding.mainSearchText) {
             setRightDrawableOnTouchListener {
                 text?.clear()
-                charactersAdapter.clearList()
-                pageOffset = 0
-                getCharactersFromServer()
+                stopSearch(this)
             }
+            setOnEditorActionListener(searchEditorActionListener)
             addTextChangedListener(searchTextChangeListener)
         }
+    }
 
-        with(binding.materialSearchBar) {
-            setHint("Tap character")
-            setCardViewElevation(10)
-            addTextChangeListener(object : TextWatcher {
-
-                override fun afterTextChanged(s: Editable?) {
-                    if (s.isNullOrEmpty().not()) {
-                        isUsingGetCharacterWithName = true
-                        viewModel.setLoadingState(true)
-                        GlobalScope.launch {
-                            withContext(Dispatchers.Main) {
-                                startSearch(s.toString()).collect { value ->
-                                    characterList.clear()
-                                    swapCharacterList(value)
-                                    viewModel.setLoadingState(false)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {}
-
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    val suggest = ArrayList<String>()
-                    for (search in lastSuggestionsList) {
-                        if (search.toLowerCase().contains(materialSearchBar.text.toLowerCase())) {
-                            suggest.add(search)
-                            materialSearchBar.lastSuggestions = suggest
-                        }
-                    }
-                }
-            })
-//            setOnSearchActionListener(object : MaterialSearchBar.OnSearchActionListener {
-//                override fun onButtonClicked(buttonCode: Int) {
-//                    if (buttonCode == 0) {
-//                        println("$text -----------------------------------------------------------")
-//                    }
-//                }
-//
-//                override fun onSearchStateChanged(enabled: Boolean) {
-//                    if (!enabled) {
-//                        binding.recyclerView.adapter = charactersAdapter
-//                    }
-//                }
-//
-//                override fun onSearchConfirmed(text: CharSequence?) {
-//                    //after ok click
-//                }
-//            })
-        }
+    private fun stopSearch(view: View) {
+        view.clearFocus()
+        view.hideKeyboard()
+        viewModel.showSearchBar(false)
+        charactersAdapter.clearList()
+        pageOffset = 0
+        getCharactersFromServer()
     }
 
     fun startSearch(text: String) = flow {
+        isUsingGetCharacterWithName = true
+        viewModel.setLoadingState(true)
         val characterList = repository.getCharacterNameStartsWith(text).data.results
         emit(characterList)
     }
-    
+
     private fun setupRecyclerView() {
         with(binding.recyclerView) {
             adapter = charactersAdapter
@@ -144,6 +101,24 @@ class CharactersFragment : Fragment() {
             addOnScrollListener(endlessRecyclerViewScrollListener)
         }
         getCharactersFromServer()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.search_menu, menu)
+
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when (item.itemId) {
+            R.id.action_search -> {
+                viewModel.showSearchBar(true)
+                binding.mainSearchText.requestFocus()
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     private fun getCharactersFromServer() {
@@ -209,25 +184,42 @@ class CharactersFragment : Fragment() {
             val action = CharactersFragmentDirections.actionNavCharactersToCharacterDetailsFragment(
                 selectedCharacterId
             )
-            view?.findNavController()?.navigate(action)
+            findNavController().navigate(action)
         }
     }
 
     private val searchTextChangeListener = object : TextWatcher {
-        override fun afterTextChanged(s: Editable?) {}
-
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            if (count >= 3 && !isUsingGetCharacterWithName) {
-                turnOffEndlessScrollListener()
-                binding.recyclerView.scheduleLayoutAnimation()
-                getCharacterFromServerNameStartsWith(s.toString())
-            } else if (count <= 1) {
-                initializeEndlessScrollListener()
+        override fun afterTextChanged(s: Editable?) {
+            if (s.isNullOrEmpty().not()) {
+                isUsingGetCharacterWithName = true
+                viewModel.setLoadingState(true)
+                GlobalScope.launch {
+                    withContext(Dispatchers.Main) {
+                        startSearch(s.toString()).collect { characters ->
+                            characterList.clear()
+                            swapCharacterList(characters)
+                            viewModel.setLoadingState(false)
+                        }
+                    }
+                }
+            } else {
+                //initializeEndlessScrollListener()
                 charactersAdapter.clearList()
                 pageOffset = 0
                 getCharactersFromServer()
             }
+        }
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+    }
+
+    private val searchEditorActionListener = TextView.OnEditorActionListener { v, actionId, _ ->
+        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+            v.clearFocus()
+            v.hideKeyboard()
+            true
+        } else {
+            false
         }
     }
 }
