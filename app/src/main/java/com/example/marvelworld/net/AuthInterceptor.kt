@@ -7,8 +7,8 @@ class AuthInterceptor : Interceptor {
     private val TIMESTAMP_KEY = "ts"
     private val HASH_KEY = "hash"
     private val APIKEY_KEY = "apikey"
-    private val myPublicKey = "5e3709823c51dcb4e8ac6d55e0820258"
-    private val myPrivateKey = "41b93668ff874b80a529c4f9fa2150d482e0f0a2"
+    private val myPublicKey = "Get your own key from https://developer.marvel.com"
+    private val myPrivateKey = "Get your own key from https://developer.marvel.com"
 
     private val authHashGenerator = AuthHashGenerator()
 
